@@ -3,7 +3,6 @@ package com.project.configurations;
 import com.project.filters.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -15,10 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.servlet.FilterRegistration;
 import java.util.Arrays;
 
 import static org.springframework.http.HttpMethod.*;
@@ -45,43 +42,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         String.format("%s/auth/login", apiPrefix)
                 )
                 .permitAll()
-                .antMatchers(GET,
-                        String.format("%s/categories**", apiPrefix)).hasAnyRole("USER", "ADMIN")
-                .antMatchers(POST,
-                        String.format("%s/categories/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(PUT,
-                        String.format("%s/categories/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(DELETE,
-                        String.format("%s/categories/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(GET,
-                        String.format("%s/products**", apiPrefix)).hasAnyRole("USER", "ADMIN")
-                .antMatchers(POST,
-                        String.format("%s/products/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(PUT,
-                        String.format("%s/products/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(DELETE,
-                        String.format("%s/products/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(POST,
-                        String.format("%s/orders/**", apiPrefix)).hasAnyRole("USER")
-                .antMatchers(GET,
-                        String.format("%s/orders/**", apiPrefix)).hasAnyRole("USER", "ADMIN")
-                .antMatchers(PUT,
-                        String.format("%s/orders/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(DELETE,
-                        String.format("%s/orders/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(POST,
-                        String.format("%s/order_details/**", apiPrefix)).hasAnyRole("USER")
-                .antMatchers(GET,
-                        String.format("%s/order_details/**", apiPrefix)).hasAnyRole("USER", "ADMIN")
-                .antMatchers(PUT,
-                        String.format("%s/order_details/**", apiPrefix)).hasRole("ADMIN")
-                .antMatchers(DELETE,
-                        String.format("%s/order_details/**", apiPrefix)).hasRole("ADMIN")
                 .anyRequest().authenticated();
     }
 
     @Bean
-    public FilterRegistrationBean corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000");
@@ -99,8 +64,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(-102);
-        return bean;
+        return source;
     }
 }
