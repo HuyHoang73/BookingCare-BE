@@ -1,11 +1,11 @@
 package com.project.filters;
 
 import com.project.components.JwtTokenUtil;
+import com.project.models.BypassToken;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import com.project.models.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,7 +36,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            if(isBypassToken(request)) {
+            if(isByPassToken(request)) {
                 filterChain.doFilter(request, response); //enable bypass
                 return;
             }
@@ -63,20 +63,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isBypassToken(@NonNull  HttpServletRequest request) {
-        final List<Pair<String, String>> bypassTokens = Arrays.asList(
-                Pair.of(String.format("%s/products", apiPrefix), "GET"),
-                Pair.of(String.format("%s/categories", apiPrefix), "GET"),
-                Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
-                Pair.of(String.format("%s/auth/login", apiPrefix), "POST")
+    private boolean isByPassToken(@NonNull HttpServletRequest request) {
+        final List<BypassToken> ByPassTokens = Arrays.asList(
+                new BypassToken("/products", "GET"),
+                new BypassToken("/categories", "GET"),
+                new BypassToken("/api/users", "POST"),
+                new BypassToken("/api/auth/login", "POST")
         );
-        for(Pair<String, String> bypassToken: bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
-                return true;
-            }
-        }
-        return false;
+
+        return ByPassTokens.stream()
+                .anyMatch(ByPassToken ->
+                        request.getServletPath().contains(ByPassToken.getPath()) &&
+                                request.getMethod().equals(ByPassToken.getMethod())
+                );
     }
 }
 

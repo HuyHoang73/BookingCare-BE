@@ -37,8 +37,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "phonenumber", nullable = false, length = 15)
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    @Column(name = "gender", nullable = false)
+    private String gender;
 
     @Column(name = "address", nullable = false)
     private String address;
@@ -55,13 +55,13 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "avatar", nullable = false)
     private String avatar;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "status", nullable = false)
     private Integer status;
 
-    @Column(name = "experience", nullable = false)
+    @Column(name = "experience")
     private Integer experience;
 
     @Column(name = "certification")

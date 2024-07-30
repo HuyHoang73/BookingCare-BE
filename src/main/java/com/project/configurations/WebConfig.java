@@ -34,7 +34,7 @@ public class WebConfig {
                 .findByUsername(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "Cannot find user with phone number = " + username));
+                                "Cannot find user with username = " + username));
     }
 
     @Bean

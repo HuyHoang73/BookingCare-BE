@@ -1,12 +1,17 @@
 package com.project.services.impl;
 
 import com.project.components.JwtTokenUtil;
+import com.project.constants.SystemConstant;
+import com.project.converters.UserConverter;
+import com.project.dto.UserDTO;
 import com.project.exceptions.DataNotFoundException;
 import com.project.models.User;
 import com.project.repositories.RoleRepository;
 import com.project.repositories.UserRepository;
 import com.project.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
+    private final ModelMapper modelMapper;
+    private final UserConverter userConverter;
 
     @Override
     public Map<String, String> login(String username, String password) throws Exception {
@@ -48,5 +55,20 @@ public class UserServiceImpl implements UserService {
         map.put("role", existingUser.getAuthorities().iterator().next().getAuthority());
         map.put("userId", String.valueOf(existingUser.getId()));
         return map;
+    }
+
+    @Override
+    public User createUser(UserDTO userDTO) throws Exception {
+        //Check tài khoản tồn tại chưa
+        String username = userDTO.getUsername();
+        if(userRepository.existsByUsername(username)){
+            throw new DataIntegrityViolationException("Tài khoản đã tồn tại");
+        }
+        //Thêm user
+        User newUser = userConverter.fromDTOtoUser(userDTO);
+        newUser.setPassword(passwordEncoder.encode(SystemConstant.DEFAULT_PASSWORD));
+        newUser.setRoleUserEntities(roleRepository.findByName(SystemConstant.DEFAULT_ROLE));
+        newUser.setStatus(1);
+        return userRepository.save(newUser);
     }
 }

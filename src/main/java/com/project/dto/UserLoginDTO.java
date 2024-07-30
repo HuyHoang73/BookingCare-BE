@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserLoginDTO {
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "Username can not be blank")
     private String username;
 
     @NotBlank(message = "Password can not be blank")

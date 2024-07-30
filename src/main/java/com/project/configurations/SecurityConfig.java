@@ -1,6 +1,7 @@
 package com.project.configurations;
 
 import com.project.filters.JwtTokenFilter;
+import com.project.models.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,9 +29,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenFilter jwtTokenFilter;
 
-    @Value("${api.prefix}")
-    private String apiPrefix;
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -38,10 +36,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(
-                        String.format("%s/auth/login", apiPrefix)
-                )
-                .permitAll()
+                .antMatchers(POST, "/api/auth/login").permitAll()
+                //Api Users
+                .antMatchers(GET, "/api/users/**").permitAll()
+//                .antMatchers(POST, "/api/users/**").hasRole(Role.ADMIN)
+                .antMatchers(POST, "/api/users/**").permitAll()
+                .antMatchers(PUT, "/api/users/**").hasAnyRole(Role.ADMIN, Role.DOCTOR)
+                .antMatchers(DELETE, "/api/users/**").hasRole(Role.ADMIN)
                 .anyRequest().authenticated();
     }
 
@@ -49,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("*");
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,

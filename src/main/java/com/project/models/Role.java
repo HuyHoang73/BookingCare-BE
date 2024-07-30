@@ -27,5 +27,5 @@ public class Role extends BaseEntity {
     private List<User> usersEntities = new ArrayList<>();
 
     public static String ADMIN = "ADMIN";
-    public static String USER = "USER";
+    public static String DOCTOR = "DOCTOR";
 }

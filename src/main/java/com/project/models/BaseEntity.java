@@ -36,6 +36,7 @@ public class BaseEntity implements Serializable {
 
     @PrePersist
     protected void onCreate() {
+        this.createdDate = new Date();
         this.modifiedDate = null;
         this.modifiedBy = null;
     }
