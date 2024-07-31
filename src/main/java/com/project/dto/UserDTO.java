@@ -44,8 +44,6 @@ public class UserDTO extends BaseDTO{
 
     private String description;
 
-    private Integer experience;
-
     private Integer certification;
 
     private String degree;

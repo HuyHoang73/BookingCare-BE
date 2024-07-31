@@ -32,12 +32,12 @@ public class JwtTokenUtil {
         try {
             return Jwts.builder()
                     .setClaims(claims) //how to extract claims from this ?  Payload
-                    .setSubject(user.getPhoneNumber())
+                    .setSubject(user.getUsername())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L)) //30 ngày
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
         }catch (Exception e) {
-            throw new InvalidParamException("Cannot create jwt token, error: "+e.getMessage());
+            throw new InvalidParamException("Cannot create jwt token, error: " + e.getMessage());
         }
     }
 

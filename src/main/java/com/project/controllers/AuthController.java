@@ -24,7 +24,6 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(
             @Valid @RequestBody UserLoginDTO userLoginDTO) {
         Map<String, String> response = new HashMap<>();
-        System.out.println(userLoginDTO);
         try {
             response = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
             return ResponseEntity.ok(response);

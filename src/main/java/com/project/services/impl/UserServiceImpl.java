@@ -12,6 +12,7 @@ import com.project.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,5 +72,18 @@ public class UserServiceImpl implements UserService {
         newUser.setRoleUserEntities(roleRepository.findByName(SystemConstant.DEFAULT_ROLE));
         newUser.setStatus(1);
         return userRepository.save(newUser);
+    }
+
+    /**
+     * Phương thức này dùng để tự động cập nhật số năm kinh nghiệm của bác sĩ hằng năm
+     */
+    @Scheduled(cron = "0 0 0 1 1 *") // Chạy vào ngày 1 tháng 1 mỗi năm
+    public void updateExperience() {
+        List<User> doctors = userRepository.findAll();
+        for (User doctor : doctors) {
+            Integer experience = doctor.getExperience() + 1;
+            doctor.setExperience(experience);
+        }
+        userRepository.saveAll(doctors);
     }
 }
