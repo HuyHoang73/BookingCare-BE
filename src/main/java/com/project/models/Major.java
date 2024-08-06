@@ -32,6 +32,9 @@ public class Major extends BaseEntity{
     @Column(name = "image", nullable = false)
     private String image;
 
+    @Column(name = "idimage", length = 64)
+    private String idimage;
+
     @OneToMany(mappedBy = "majorUserEntities", fetch = FetchType.LAZY)
     private List<User> userEntities = new ArrayList<>();
 }

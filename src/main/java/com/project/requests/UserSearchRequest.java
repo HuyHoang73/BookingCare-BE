@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DoctorSearchRequest {
+public class UserSearchRequest {
     private String name;
     private String address;
     private String gmail;
@@ -25,5 +25,5 @@ public class DoctorSearchRequest {
     private Integer certificationFrom;
     private Integer certificationTo;
     private String degree;
-    private String major;
+    private Long major;
 }

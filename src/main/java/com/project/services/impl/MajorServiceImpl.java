@@ -27,8 +27,17 @@ public class MajorServiceImpl implements MajorService {
     }
 
     @Override
+    public boolean checkMajorExistence(String majorName) {
+        return majorRepository.findByName(majorName) != null;
+    }
+
+    @Override
     @Transactional
-    public Major createMajor(Major major) {
+    public Major createMajor(Major major, String urlImage, String idImage) {
+        if(idImage != null && urlImage != null) {
+            major.setIdimage(idImage);
+            major.setImage(urlImage);
+        }
         return majorRepository.save(major);
     }
 

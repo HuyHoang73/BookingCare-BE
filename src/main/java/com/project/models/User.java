@@ -1,6 +1,5 @@
 package com.project.models;
 
-import com.project.constants.Gender;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,6 +54,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "avatar", nullable = false)
     private String avatar;
 
+    @Column(name = "idimage", length = 100)
+    private String idimage;
+
     @Column(name = "description")
     private String description;
 
@@ -69,6 +71,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "degree", length = 10)
     private String degree;
+
+    @Column(name = "deletedyear")
+    private Integer deletedyear;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")

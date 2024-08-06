@@ -18,17 +18,34 @@ public class UserConverter {
 
     /**
      * Phương thức này để chuyển đổi từ UserDTO sang UserEntity
+     *
      * @param userDTO - dưới dạng DTO
      * @return dưới dạng Entity
      */
     public User fromDTOtoUser(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
-        String majorName = userDTO.getMajor();
-        user.setMajorUserEntities(majorRepository.findByName(majorName));
+        Long majorId = userDTO.getMajorId();
+        user.setMajorUserEntities(majorRepository.findById(majorId).get());
         String dob = userDTO.getDateOfBirth();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
         user.setDateOfBirth(dateOfBirth);
         return user;
+    }
+
+    /**
+     * Phương thức này dùng để chuyển đổi từ UserEntity thành UserDTO
+     * @param user - Dạng entity
+     * @return UserDTO
+     */
+    public UserDTO fromUserToDTO(User user) {
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        Long majorId = user.getMajorUserEntities().getId();
+        userDTO.setMajorId(majorId);
+        LocalDate dateOfBirth = user.getDateOfBirth();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String dob = dateOfBirth.format(formatter);
+        userDTO.setDateOfBirth(dob);
+        return userDTO;
     }
 }

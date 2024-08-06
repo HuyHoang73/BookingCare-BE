@@ -1,5 +1,6 @@
 package com.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,9 +45,12 @@ public class UserDTO extends BaseDTO{
 
     private String description;
 
+    private Integer experience;
+
     private Integer certification;
 
     private String degree;
 
-    private String major;
+    @JsonProperty("major")
+    private Long majorId;
 }

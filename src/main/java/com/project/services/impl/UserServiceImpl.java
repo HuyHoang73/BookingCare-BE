@@ -8,6 +8,7 @@ import com.project.exceptions.DataNotFoundException;
 import com.project.models.User;
 import com.project.repositories.RoleRepository;
 import com.project.repositories.UserRepository;
+import com.project.requests.UserSearchRequest;
 import com.project.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,11 +19,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -60,6 +60,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO getUserById(Long id) throws Exception {
+        User user = userRepository.findById(id).
+                orElseThrow(() -> new DataNotFoundException("Cannot find user with id " + id));
+        return userConverter.fromUserToDTO(user);
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers(UserSearchRequest request) {
+        return userRepository.getAllUsers(request).stream()
+                .map(userConverter::fromUserToDTO) //Chuyển từng User thành UserDTO
+                .collect(Collectors.toList()); //Tạo List mới
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Cannot find user with id " + id));
+        user.setStatus(0);
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
     public User createUser(UserDTO userDTO) throws Exception {
         //Check tài khoản tồn tại chưa
         String username = userDTO.getUsername();

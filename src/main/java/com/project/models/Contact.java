@@ -20,8 +20,8 @@ public class Contact extends BaseEntity{
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "dateofbirth", nullable = false)
-    private LocalDate dateOfBirth;
+    @Column(name = "vocative", nullable = false)
+    private String vocative;
 
     @Column(name = "phonenumber", nullable = false, length = 15)
     private String phoneNumber;

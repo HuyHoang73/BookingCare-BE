@@ -1,23 +1,26 @@
 package com.project.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.models.Major;
-import com.project.models.User;
 import com.project.responses.MajorResponse;
 import com.project.services.MajorService;
+import com.project.services.impl.CloudinaryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/majors")
 public class MajorController {
     private final MajorService majorService;
+    private final CloudinaryServiceImpl cloudinaryService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<?> getAllMajors() {
@@ -31,13 +34,21 @@ public class MajorController {
     }
 
     @PostMapping
-    public ResponseEntity<?> creeateMajor(@RequestBody Major major) {
-        try{
-            Major newMajor = majorService.createMajor(major);
-            return ResponseEntity.ok().body("Thành công");
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()); //rule 5
+    public ResponseEntity<?> createMajor(@RequestPart("file") MultipartFile multipartFile,
+                                         @RequestParam("majordto") String majordtoJson) {
+        try {
+            // Chuyển đổi chuỗi JSON thành đối tượng Major
+            Major major = objectMapper.readValue(majordtoJson, Major.class);
+
+            if (majorService.checkMajorExistence(major.getName())) {
+                return ResponseEntity.badRequest().body("Tên khoa đã tồn tại");
+            }
+
+            Map<String, Object> data = cloudinaryService.upload(multipartFile);
+            majorService.createMajor(major, data.get("url").toString(), data.get("public_id").toString());
+            return ResponseEntity.ok().body("Đã tạo thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 }
