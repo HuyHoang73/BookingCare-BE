@@ -1,11 +1,10 @@
 package com.project.controllers;
 
-import com.project.constants.BookingStatus;
 import com.project.dto.BookingDTO;
 import com.project.models.Booking;
 import com.project.repositories.BookingRepository;
+import com.project.requests.BookingUpdateRequest;
 import com.project.services.BookingService;
-import com.project.services.impl.MailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +18,16 @@ import java.util.Optional;
 @RequestMapping("api/bookings")
 public class BookingController {
     private final BookingService bookingService;
-    private final MailServiceImpl mailService;
     private final BookingRepository bookingRepository;
 
     @PostMapping
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingDTO bookingDTO) {
         try{
-            String s = bookingService.createBooking(bookingDTO);
-            mailService.sendMail(bookingDTO.getGmail(),"Thư xác nhận lịch khám",s);
+            bookingService.createBooking(bookingDTO);
             return ResponseEntity.ok().body("Success");
         }
         catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 
@@ -42,10 +39,21 @@ public class BookingController {
             if(!booking.isPresent() || booking.get().getToken() == null || !booking.get().getToken().equals(token)) {
                 return ResponseEntity.badRequest().body("Invalid path");
             }
-            bookingService.updateBooking(id, BookingStatus.CONFIRMING);
+            BookingUpdateRequest bookingUpdateRequest = new BookingUpdateRequest(id, "confirm");
+            bookingService.updateBooking(bookingUpdateRequest);
             return ResponseEntity.ok().body("Success");
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateBooking(@Valid @RequestBody BookingUpdateRequest bookingUpdateRequest) {
+        try{
+            bookingService.updateBooking(bookingUpdateRequest);
+            return ResponseEntity.ok().body("Success");
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 }
