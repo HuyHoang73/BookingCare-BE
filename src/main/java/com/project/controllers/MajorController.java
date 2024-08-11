@@ -1,6 +1,7 @@
 package com.project.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.dto.MajorDTO;
 import com.project.models.Major;
 import com.project.responses.MajorResponse;
 import com.project.services.MajorService;
@@ -38,15 +39,22 @@ public class MajorController {
                                          @RequestParam("majordto") String majordtoJson) {
         try {
             // Chuyển đổi chuỗi JSON thành đối tượng Major
-            Major major = objectMapper.readValue(majordtoJson, Major.class);
+            MajorDTO majorDTO = objectMapper.readValue(majordtoJson, MajorDTO.class);
+            majorService.createMajor(majorDTO, multipartFile);
+            return ResponseEntity.ok().body("Thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
 
-            if (majorService.checkMajorExistence(major.getName())) {
-                return ResponseEntity.badRequest().body("Tên khoa đã tồn tại");
-            }
-
-            Map<String, Object> data = cloudinaryService.upload(multipartFile);
-            majorService.createMajor(major, data.get("url").toString(), data.get("public_id").toString());
-            return ResponseEntity.ok().body("Đã tạo thành công");
+    @PutMapping
+    public ResponseEntity<?> updateMajor(@RequestPart("file") MultipartFile multipartFile,
+                                         @RequestParam("majordto") String majordtoJson) {
+        try {
+            // Chuyển đổi chuỗi JSON thành đối tượng Major
+            MajorDTO majorDTO = objectMapper.readValue(majordtoJson, MajorDTO.class);
+            majorService.updateMajor(majorDTO, multipartFile);
+            return ResponseEntity.ok().body("Thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

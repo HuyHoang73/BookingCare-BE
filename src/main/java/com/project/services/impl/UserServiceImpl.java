@@ -11,7 +11,6 @@ import com.project.repositories.UserRepository;
 import com.project.requests.UserSearchRequest;
 import com.project.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
-    private final ModelMapper modelMapper;
+    private final CloudinaryServiceImpl cloudinaryService;
     private final UserConverter userConverter;
 
     @Override
@@ -83,18 +83,47 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User createUser(UserDTO userDTO) throws Exception {
+    public void createUser(UserDTO userDTO, MultipartFile multipartFile) throws Exception {
         //Check tài khoản tồn tại chưa
         String username = userDTO.getUsername();
-        if(userRepository.existsByUsername(username)){
+        if (userRepository.existsByUsername(username)) {
             throw new DataIntegrityViolationException("Tài khoản đã tồn tại");
         }
+
         //Thêm user
         User newUser = userConverter.fromDTOtoUser(userDTO);
+        //Upload ảnh
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            Map<String, Object> data = cloudinaryService.upload(multipartFile);
+            newUser.setIdimage(data.get("public_id").toString());
+            newUser.setAvatar(data.get("url").toString());
+        }
         newUser.setPassword(passwordEncoder.encode(SystemConstant.DEFAULT_PASSWORD));
         newUser.setRoleUserEntities(roleRepository.findByName(SystemConstant.DEFAULT_ROLE));
         newUser.setStatus(1);
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(UserDTO userDTO, MultipartFile multipartFile) throws Exception {
+        //Check tài khoản tồn tại chưa
+        Optional<User> optionalUser = userRepository.findById(userDTO.getId());
+        if (!optionalUser.isPresent()) {
+            throw new DataNotFoundException("Tài khoản không tồn tại");
+        }
+
+        //Cập nhật user
+        User updateUser = optionalUser.get();
+        userConverter.updateUserFromDTO(userDTO, updateUser);
+        // Upload ảnh
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            cloudinaryService.delete(updateUser.getIdimage());
+            Map<String, Object> data = cloudinaryService.upload(multipartFile);
+            updateUser.setIdimage(data.get("public_id").toString());
+            updateUser.setAvatar(data.get("url").toString());
+        }
+        userRepository.save(updateUser);
     }
 
     /**

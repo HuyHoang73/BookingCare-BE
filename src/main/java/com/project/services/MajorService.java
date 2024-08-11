@@ -1,12 +1,14 @@
 package com.project.services;
 
-import com.project.models.Major;
+import com.project.dto.MajorDTO;
 import com.project.responses.MajorResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface MajorService {
-    boolean checkMajorExistence(String majorName);
-    Major createMajor(Major major, String urlImage, String idImage);
+    void createMajor(MajorDTO majorDTO, MultipartFile multipartFile) throws Exception;
+    void updateMajor(MajorDTO majorDTO, MultipartFile multipartFile) throws Exception;
     List<MajorResponse> getAllMajors();
+    MajorResponse getMajorById(Long id);
 }

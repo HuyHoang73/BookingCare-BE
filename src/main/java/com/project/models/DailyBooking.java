@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "time")
+@Table(name = "dailybooking")
 public class DailyBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

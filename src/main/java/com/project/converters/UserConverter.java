@@ -48,4 +48,27 @@ public class UserConverter {
         userDTO.setDateOfBirth(dob);
         return userDTO;
     }
+
+    /**
+     * Phương thức sau để cập nhật 1 User t DTO
+     *
+     * @param userDTO - DTO dùng để sao chép
+     * @param user    - User cần sao chép
+     */
+    public void updateUserFromDTO(UserDTO userDTO, User user) {
+        modelMapper.map(userDTO, user);
+
+        if (userDTO.getMajorId() != null) {
+            Long majorId = userDTO.getMajorId();
+            user.setMajorUserEntities(majorRepository.findById(majorId).orElse(null));
+        }
+
+        if (userDTO.getDateOfBirth() != null) {
+            String dob = userDTO.getDateOfBirth();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
+            user.setDateOfBirth(dateOfBirth);
+        }
+    }
+
 }

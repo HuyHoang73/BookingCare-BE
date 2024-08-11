@@ -1,8 +1,8 @@
 package com.project.constants;
 
 public enum BookingStatus {
-    CONFIRMING("Chờ xác nhận"),
-    PENDING("Chờ xử lý"),
+    PENDING("Chờ xác nhận"),
+    CONFIRMING("Chờ xử lý"),
     ACCEPTING("Đã xử lý"),
     SUCCESS("Thành công"),
     FAILURE("Không tới khám");

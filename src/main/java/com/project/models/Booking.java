@@ -1,7 +1,6 @@
 package com.project.models;
 
 import com.project.constants.BookingStatus;
-import com.project.constants.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,17 +23,17 @@ public class Booking extends BaseEntity{
     @Column(name = "fullname", nullable = false, length = 50)
     private String fullname;
 
+    @Column(name = "address", nullable = false, length = 255)
+    private String address;
+
     @Column(name = "dateofbirth", nullable = false)
     private LocalDate dateOfBirth;
 
     @Column(name = "gmail", nullable = false)
     private String gmail;
 
-    @Column(name = "phone", nullable = false)
-    private String phone;
-
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    @Column(name = "phonenumber", nullable = false)
+    private String phoneNumber;
 
     @Column(name = "note", nullable = false)
     private String note;
@@ -42,8 +41,8 @@ public class Booking extends BaseEntity{
     @Column(name = "major_id")
     private Long majorId;
 
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+    @Column(name = "datebooking", nullable = false)
+    private LocalDate dateBooking;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;

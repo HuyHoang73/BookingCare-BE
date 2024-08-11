@@ -26,4 +26,5 @@ public class UserSearchRequest {
     private Integer certificationTo;
     private String degree;
     private Long major;
+    private Long status;
 }

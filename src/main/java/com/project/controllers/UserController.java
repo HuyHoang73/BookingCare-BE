@@ -1,19 +1,23 @@
 package com.project.controllers;
 
 import com.project.dto.UserDTO;
+import com.project.models.Major;
 import com.project.models.User;
 import com.project.requests.UserSearchRequest;
-import com.project.responses.MajorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.services.UserService;
+import com.project.services.impl.CloudinaryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 @RequestMapping("api/users")
 public class UserController {
     private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<?> getAllUsers(@RequestBody UserSearchRequest request) {
@@ -37,24 +42,31 @@ public class UserController {
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             UserDTO existingUser = userService.getUserById(id);
-            return ResponseEntity.ok(existingUser);
+            return ResponseEntity.ok().body(existingUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO,
-                                        BindingResult result){
+    public ResponseEntity<?> createUser(@RequestPart("file") MultipartFile multipartFile,
+                                        @RequestParam("userdto") String userdtoJson) {
         try{
-            if(result.hasErrors()){
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .collect(Collectors.toList());
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
-            User user = userService.createUser(userDTO);
+            UserDTO userDTO = objectMapper.readValue(userdtoJson, UserDTO.class);
+            userService.createUser(userDTO, multipartFile);
+            return ResponseEntity.ok().body("Thành công");
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()); //rule 5
+        }
+    }
+
+    @PutMapping()
+    public ResponseEntity<?> updateUser(@RequestPart("file") MultipartFile multipartFile,
+                                        @RequestParam("userdto") String userdtoJson) {
+        try{
+            UserDTO userDTO = objectMapper.readValue(userdtoJson, UserDTO.class);
+            userService.updateUser(userDTO, multipartFile);
             return ResponseEntity.ok().body("Thành công");
         }
         catch (Exception ex){
@@ -66,7 +78,7 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
         try {
             userService.deleteUserById(id);
-            return ResponseEntity.ok("Success");
+            return ResponseEntity.ok().body("Thành công");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
