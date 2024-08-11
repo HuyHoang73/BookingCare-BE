@@ -1,24 +1,16 @@
 package com.project.controllers;
 
 import com.project.dto.UserDTO;
-import com.project.models.Major;
-import com.project.models.User;
 import com.project.requests.UserSearchRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.services.UserService;
-import com.project.services.impl.CloudinaryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor

@@ -7,8 +7,12 @@ import com.project.exceptions.DataNotFoundException;
 import com.project.exceptions.ResourceAlreadyExitsException;
 import com.project.models.*;
 import com.project.repositories.*;
+import com.project.requests.BookingSearchRequest;
 import com.project.requests.BookingUpdateRequest;
+import com.project.responses.BookingResponse;
+import com.project.responses.CalendarResponse;
 import com.project.services.BookingService;
+import com.project.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,9 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import java.text.ParseException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -138,5 +144,43 @@ public class BookingServiceImpl implements BookingService {
             }
             bookingRepository.save(booking.get());
         }
+    }
+
+    @Override
+    public List<BookingResponse> getAllBookings(BookingSearchRequest bookingSearchRequest) throws DataNotFoundException {
+        return bookingRepository.searchBookings(bookingSearchRequest).stream()
+                .map(bookingConverter::fromBookingToBookingResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CalendarResponse> getCalendars() throws DataNotFoundException {
+        LocalDate[] weekRange = DateUtils.getStartAndEndOfWeek();
+        LocalDate startOfWeek = weekRange[0];
+        LocalDate endOfWeek = weekRange[1];
+
+        List<Booking> bookings = bookingRepository.getCalendar(startOfWeek, endOfWeek);
+
+        List<BookingResponse> bookingResponses = bookings.stream()
+                .map(bookingConverter::fromBookingToBookingResponse)
+                .collect(Collectors.toList());
+
+        //Nhóm theo thứ trong tuần
+        Map<DayOfWeek, List<BookingResponse>> groupedBookings = bookingResponses.stream()
+                .collect(Collectors.groupingBy(bookingResponse ->
+                        LocalDate.parse(bookingResponse.getDateBooking(), DateTimeFormatter.ofPattern("dd/MM/yyyy")).getDayOfWeek()));
+
+        List<CalendarResponse> calendarResponses = new ArrayList<>();
+
+        // Sắp xếp theo thứ tự từ thứ Hai đến Chủ Nhật
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+            List<BookingResponse> bookingsForDay = groupedBookings.getOrDefault(dayOfWeek, Collections.emptyList());
+            CalendarResponse calendarResponse = new CalendarResponse();
+            calendarResponse.setDay(dayOfWeek);
+            calendarResponse.setBookings(bookingsForDay);
+            calendarResponses.add(calendarResponse);
+        }
+
+        return calendarResponses;
     }
 }

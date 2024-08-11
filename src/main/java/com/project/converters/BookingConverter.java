@@ -5,8 +5,10 @@ import com.project.models.Booking;
 import com.project.models.Major;
 import com.project.models.Time;
 import com.project.models.User;
+import com.project.repositories.MajorRepository;
 import com.project.repositories.TimeRepository;
 import com.project.repositories.UserRepository;
+import com.project.responses.BookingResponse;
 import com.project.responses.MajorResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +25,8 @@ public class BookingConverter {
     private final ModelMapper modelMapper;
     private final TimeRepository timeRepository;
     private final UserRepository userRepository;
+    private final MajorRepository majorRepository;
+
     /**
      * Phương thức này để chuyển đổi từ bookingDTO sang BookingEntity
      * @param bookingDTO - dưới dạng Entity
@@ -43,5 +47,21 @@ public class BookingConverter {
         booking.setDateOfBirth(dateOfBirth);
         booking.setToken(UUID.randomUUID().toString());
         return booking;
+    }
+
+    /**
+     * Phương thức này để chuyển đổi từ Booking sang BookingResponse
+     * @param booking - dưới dạng Entity
+     * @return dưới dạng Response
+     */
+    public BookingResponse fromBookingToBookingResponse(Booking booking) {
+        BookingResponse bookingResponse = modelMapper.map(booking, BookingResponse.class);
+        bookingResponse.setDoctor(booking.getUserBookingEntities().getName());
+        bookingResponse.setMajor(majorRepository.findById(booking.getMajorId()).get().getName());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String formattedDate = booking.getDateBooking().format(formatter);
+        bookingResponse.setDateBooking(formattedDate);
+        bookingResponse.setTimeBooking(booking.getTimeBookingEntities().getStart() + "h - " + booking.getTimeBookingEntities().getEnd() + "h");
+        return bookingResponse;
     }
 }

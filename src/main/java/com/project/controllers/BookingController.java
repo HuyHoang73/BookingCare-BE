@@ -3,7 +3,9 @@ package com.project.controllers;
 import com.project.dto.BookingDTO;
 import com.project.models.Booking;
 import com.project.repositories.BookingRepository;
+import com.project.requests.BookingSearchRequest;
 import com.project.requests.BookingUpdateRequest;
+import com.project.responses.BookingResponse;
 import com.project.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -19,6 +22,17 @@ import java.util.Optional;
 public class BookingController {
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
+
+    @GetMapping
+    public ResponseEntity<?> getAllBookings(@RequestBody BookingSearchRequest bookingSearchRequest) {
+        try{
+            List<BookingResponse> result = bookingService.getAllBookings(bookingSearchRequest);
+            return ResponseEntity.ok().body(result);
+        }
+        catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
 
     @PostMapping
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingDTO bookingDTO) {
