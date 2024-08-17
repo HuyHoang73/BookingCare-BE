@@ -1,5 +1,6 @@
 package com.project.responses;
 
+import com.project.dto.BaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingResponse {
-    private Long id;
-    private String createdDate;
+public class BookingResponse extends BaseDTO {
     private String dateOfBirth;
     private String major;
     private String doctor;

@@ -1,17 +1,15 @@
-package com.project.requests;
+package com.project.responses;
 
+import com.project.dto.BaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingUpdateRequest {
-    private Long id;
-    private String status;
+public class TimeResponse extends BaseDTO {
+    private String time;
 }

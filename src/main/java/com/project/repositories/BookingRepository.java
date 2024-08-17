@@ -11,14 +11,15 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE " +
-            "(:#{#dto.doctorId} IS NULL OR b.userBookingEntities.id = :#{#dto.doctorId}) AND " +
+            "(:#{#dto.username} IS NULL OR b.userBookingEntities.username = :#{#dto.username}) AND " +
             "(:#{#dto.status} IS NULL OR b.status = :#{#dto.status}) AND " +
             "(:#{#dto.dateBookingFrom} IS NULL OR b.dateBooking >= :#{#dto.dateBookingFrom}) AND " +
             "(:#{#dto.dateBookingTo} IS NULL OR b.dateBooking <= :#{#dto.dateBookingTo})")
     List<Booking> searchBookings(@Param("dto") BookingSearchRequest bookingSearchRequest);
 
-    @Query("SELECT b FROM Booking b WHERE b.dateBooking BETWEEN :startOfWeek AND :endOfWeek")
+    @Query("SELECT b FROM Booking b WHERE b.userBookingEntities.username = :username AND b.dateBooking BETWEEN :startOfWeek AND :endOfWeek")
     List<Booking> getCalendar(@Param("startOfWeek") LocalDate startOfWeek,
-                              @Param("endOfWeek") LocalDate endOfWeek);
+                              @Param("endOfWeek") LocalDate endOfWeek,
+                              @Param("username") String username);
 
 }

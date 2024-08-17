@@ -5,13 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingUpdateRequest {
-    private Long id;
-    private String status;
+public class MajorSearchRequest {
+    private String name;
+    private Integer minDoctors;
+    private Integer maxDoctors;
 }

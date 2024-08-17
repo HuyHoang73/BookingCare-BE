@@ -40,7 +40,6 @@ public class BookingConverter {
         booking.setUserBookingEntities(user.get());
         Optional<Time> time = timeRepository.findById(bookingDTO.getTimeBookingId());
         booking.setTimeBookingEntities(time.get());
-        booking.setId(bookingDTO.getTimeBookingId());
         LocalDate dateBooking = LocalDate.parse(bookingDTO.getDateBooking(), DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         booking.setDateBooking(dateBooking);
         LocalDate dateOfBirth = LocalDate.parse(bookingDTO.getDateOfBirth(), DateTimeFormatter.ofPattern("dd-MM-yyyy"));
@@ -55,7 +54,13 @@ public class BookingConverter {
      * @return dưới dạng Response
      */
     public BookingResponse fromBookingToBookingResponse(Booking booking) {
+        modelMapper.typeMap(Booking.class, BookingResponse.class)
+                .addMappings(mapper -> {
+                    mapper.skip(BookingResponse::setTimeBooking);
+                    mapper.skip(BookingResponse::setStatus);
+                });
         BookingResponse bookingResponse = modelMapper.map(booking, BookingResponse.class);
+        bookingResponse.setStatus(booking.getStatus().getBookingStatusName());
         bookingResponse.setDoctor(booking.getUserBookingEntities().getName());
         bookingResponse.setMajor(majorRepository.findById(booking.getMajorId()).get().getName());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

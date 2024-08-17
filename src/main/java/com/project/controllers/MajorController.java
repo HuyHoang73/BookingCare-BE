@@ -2,7 +2,7 @@ package com.project.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.dto.MajorDTO;
-import com.project.models.Major;
+import com.project.requests.MajorSearchRequest;
 import com.project.responses.MajorResponse;
 import com.project.services.MajorService;
 import com.project.services.impl.CloudinaryServiceImpl;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,11 +22,22 @@ public class MajorController {
     private final CloudinaryServiceImpl cloudinaryService;
     private final ObjectMapper objectMapper;
 
-    @GetMapping
-    public ResponseEntity<?> getAllMajors() {
+    @PostMapping("/search")
+    public ResponseEntity<?> getAllMajors(@RequestBody MajorSearchRequest majorSearchRequest) {
         try{
-            List<MajorResponse> majors = majorService.getAllMajors();
+            List<MajorResponse> majors = majorService.getAllMajors(majorSearchRequest);
             return ResponseEntity.ok().body(majors);
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()); //rule 5
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMajorById(@PathVariable Long id) {
+        try{
+            MajorResponse major = majorService.getMajorById(id);
+            return ResponseEntity.ok().body(major);
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()); //rule 5

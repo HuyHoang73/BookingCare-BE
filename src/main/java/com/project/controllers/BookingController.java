@@ -6,13 +6,18 @@ import com.project.repositories.BookingRepository;
 import com.project.requests.BookingSearchRequest;
 import com.project.requests.BookingUpdateRequest;
 import com.project.responses.BookingResponse;
+import com.project.responses.CalendarResponse;
 import com.project.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +28,31 @@ public class BookingController {
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
 
-    @GetMapping
+    @PostMapping("/search")
     public ResponseEntity<?> getAllBookings(@RequestBody BookingSearchRequest bookingSearchRequest) {
         try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            boolean isAdmin = authorities.stream()
+                    .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+            if(!isAdmin) {
+                String username = authentication.getName();
+                bookingSearchRequest.setUsername(username);
+            }
             List<BookingResponse> result = bookingService.getAllBookings(bookingSearchRequest);
+            return ResponseEntity.ok().body(result);
+        }
+        catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/calendars")
+    public ResponseEntity<?> getCalendars() {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            List<CalendarResponse> result = bookingService.getCalendars(username);
             return ResponseEntity.ok().body(result);
         }
         catch (Exception ex) {
@@ -45,7 +71,7 @@ public class BookingController {
         }
     }
 
-    @GetMapping("confirm/{id}")
+    @GetMapping("/confirm/{id}")
     public ResponseEntity<?> confirmBooking(@PathVariable("id") Long id,
                                             @RequestParam("token") String token) {
         try{
@@ -55,14 +81,14 @@ public class BookingController {
             }
             BookingUpdateRequest bookingUpdateRequest = new BookingUpdateRequest(id, "confirm");
             bookingService.updateBooking(bookingUpdateRequest);
-            return ResponseEntity.ok().body("Success");
+            return ResponseEntity.ok().body("Thành công");
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
     @PutMapping
-    public ResponseEntity<?> updateBooking(@Valid @RequestBody BookingUpdateRequest bookingUpdateRequest) {
+    public ResponseEntity<?> updateBooking(@RequestBody BookingUpdateRequest bookingUpdateRequest) {
         try{
             bookingService.updateBooking(bookingUpdateRequest);
             return ResponseEntity.ok().body("Success");

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -65,16 +66,22 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private boolean isByPassToken(@NonNull HttpServletRequest request) {
         final List<BypassToken> ByPassTokens = Arrays.asList(
-                new BypassToken("/products", "GET"),
                 new BypassToken("/api/majors", "GET"),
+                new BypassToken("/api/majors/search", "POST"),
                 new BypassToken("/api/users", "GET"),
+                new BypassToken("/api/users/search", "POST"),
+                new BypassToken("/api/bookings", "POST"),
+                new BypassToken("/api/bookings/confirm/**", "GET"),
+                new BypassToken("/api/times/search", "POST"),
                 new BypassToken("/api/auth/login", "POST")
         );
 
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+
         return ByPassTokens.stream()
-                .anyMatch(ByPassToken ->
-                        request.getServletPath().contains(ByPassToken.getPath()) &&
-                                request.getMethod().equals(ByPassToken.getMethod())
+                .anyMatch(bypassToken ->
+                        pathMatcher.match(bypassToken.getPath(), request.getServletPath()) &&
+                                request.getMethod().equalsIgnoreCase(bypassToken.getMethod())
                 );
     }
 }

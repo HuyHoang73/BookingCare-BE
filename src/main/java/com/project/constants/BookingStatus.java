@@ -1,5 +1,8 @@
 package com.project.constants;
 
+import lombok.Getter;
+
+@Getter
 public enum BookingStatus {
     PENDING("Chờ xác nhận"),
     CONFIRMING("Chờ xử lý"),

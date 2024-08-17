@@ -1,5 +1,6 @@
 package com.project.requests;
 
+import com.project.constants.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingSearchRequest {
-    private Long doctorId;
-    private String status;
+    private String username;
+    private BookingStatus status;
     private LocalDate dateBookingFrom;
     private LocalDate dateBookingTo;
 }

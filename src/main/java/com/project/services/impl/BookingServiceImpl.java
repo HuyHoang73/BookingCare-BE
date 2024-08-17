@@ -89,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
                 .append("<p>Tên bác sĩ khám: ").append(optionalUser.get().getName()).append("</p>\n")
                 .append("<p>Chuyên ngành: ").append(optionalMajor.get().getName()).append("</p>\n")
                 .append("<h4>Hãy nhấn xác nhận để lịch khám được hoàn thành đăng ký.</h4>\n")
-                .append("<a href='http://localhost:8080/api/confirm/").append(booking.getId())
+                .append("<a href='http://localhost:8080/api/bookings/confirm/").append(booking.getId())
                 .append("?token=").append(booking.getToken())
                 .append("' style='display:inline-block;padding:10px 20px;background-color:#1677ff;color:white;text-align:center;text-decoration:none;border-radius:5px;font-size:16px;'>")
                 .append("<h2 style='margin:0;'>Xác nhận đặt lịch khám</h2></a>");
@@ -104,6 +104,18 @@ public class BookingServiceImpl implements BookingService {
             switch (bookingUpdateRequest.getStatus()) {
                 case "accept":
                     booking.get().setStatus(BookingStatus.ACCEPTING);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("<h1>Thư xác nhận lịch khám được đặt thành công</h1>\n")
+                            .append("<p>Tên người khám: ").append(booking.get().getFullname()).append("</p>\n")
+                            .append("<p>Ngày sinh: ").append(booking.get().getDateOfBirth()).append("</p>\n")
+                            .append("<p>Số điện thoại: ").append(booking.get().getPhoneNumber()).append("</p>\n")
+                            .append("<p>Ngày khám: ").append(booking.get().getDateBooking()).append("</p>\n")
+                            .append("<p>Thòi gian khám: ").append(booking.get().getTimeBookingEntities().getStart()).append("h - ")
+                            .append(booking.get().getTimeBookingEntities().getEnd()).append("h</p>\n")
+                            .append("<p>Tên bác sĩ khám: ").append(booking.get().getUserBookingEntities().getName()).append("</p>\n")
+                            .append("<p>Triệu chứng: ").append(booking.get().getNote()).append("</p>\n")
+                            .append("<h4>Mong quý bệnh nhân đến khám đúng giờ (tối đa muộn không quá 15 phút).</h4>\n");
+                    mailService.sendMail(booking.get().getGmail(), "Thư xác nhận lịch khám được đặt thành công", sb.toString());
                     booking.get().setToken(null);
                     break;
                 case "deny":
@@ -154,12 +166,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<CalendarResponse> getCalendars() throws DataNotFoundException {
+    public List<CalendarResponse> getCalendars(String username) throws DataNotFoundException {
         LocalDate[] weekRange = DateUtils.getStartAndEndOfWeek();
         LocalDate startOfWeek = weekRange[0];
         LocalDate endOfWeek = weekRange[1];
 
-        List<Booking> bookings = bookingRepository.getCalendar(startOfWeek, endOfWeek);
+        List<Booking> bookings = bookingRepository.getCalendar(startOfWeek, endOfWeek, username);
 
         List<BookingResponse> bookingResponses = bookings.stream()
                 .map(bookingConverter::fromBookingToBookingResponse)

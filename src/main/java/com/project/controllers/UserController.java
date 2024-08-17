@@ -19,7 +19,7 @@ public class UserController {
     private final UserService userService;
     private final ObjectMapper objectMapper;
 
-    @GetMapping
+    @PostMapping("/search")
     public ResponseEntity<?> getAllUsers(@RequestBody UserSearchRequest request) {
         try{
             List<UserDTO> users = userService.getAllUsers(request);

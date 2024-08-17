@@ -39,14 +39,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, "/api/auth/login").permitAll()
                 //Api Users
                 .antMatchers(GET, "/api/users/**").permitAll()
-                .antMatchers(POST, "/api/users/**").hasRole(Role.ADMIN)
+                .antMatchers(POST, "/api/users/search").permitAll()
+                .antMatchers(POST, "/api/users/").hasRole(Role.ADMIN)
                 .antMatchers(PUT, "/api/users/**").hasAnyRole(Role.ADMIN, Role.DOCTOR)
                 .antMatchers(DELETE, "/api/users/**").hasRole(Role.ADMIN)
                 //Api Majors
                 .antMatchers(GET, "/api/majors/**").permitAll()
-                .antMatchers(POST, "/api/majors/**").hasRole(Role.ADMIN)
+                .antMatchers(POST, "/api/majors/search").permitAll()
+                .antMatchers(POST, "/api/majors/").hasRole(Role.ADMIN)
                 .antMatchers(PUT, "/api/majors/**").hasRole(Role.ADMIN)
                 .antMatchers(DELETE, "/api/majors/**").hasRole(Role.ADMIN)
+                //Api Bookings
+                .antMatchers(GET, "/api/bookings/confirm/{id}").permitAll()
+                .antMatchers(GET, "/api/bookings/").hasAnyRole(Role.ADMIN, Role.DOCTOR)
+                .antMatchers(POST, "/api/bookings/**").permitAll()
+                .antMatchers(PUT, "/api/bookings/**").hasRole(Role.DOCTOR)
+                //Api Time
+                .antMatchers(POST, "/api/times/search").permitAll()
                 .anyRequest().authenticated();
     }
 
@@ -64,7 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name(),
-                HttpMethod.DELETE.name()
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
         ));
         config.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

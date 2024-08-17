@@ -15,5 +15,5 @@ public interface BookingService {
     void createBooking(BookingDTO bookingDTO) throws ResourceAlreadyExitsException, MessagingException;
     void updateBooking(BookingUpdateRequest bookingUpdateRequest) throws MessagingException;
     List<BookingResponse> getAllBookings(BookingSearchRequest bookingSearchRequest) throws DataNotFoundException;
-    List<CalendarResponse> getCalendars() throws DataNotFoundException;
+    List<CalendarResponse> getCalendars(String username) throws DataNotFoundException;
 }
