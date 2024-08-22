@@ -53,4 +53,6 @@ public class UserDTO extends BaseDTO{
 
     @JsonProperty("major")
     private Long majorId;
+
+    private String majorName;
 }

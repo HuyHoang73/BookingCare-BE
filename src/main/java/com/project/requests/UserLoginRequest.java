@@ -1,12 +1,10 @@
 package com.project.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-@Data //toString
 @Setter
 @Getter
 @AllArgsConstructor

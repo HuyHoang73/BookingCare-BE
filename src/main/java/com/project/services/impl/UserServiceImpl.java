@@ -8,6 +8,7 @@ import com.project.exceptions.DataNotFoundException;
 import com.project.models.User;
 import com.project.repositories.RoleRepository;
 import com.project.repositories.UserRepository;
+import com.project.requests.UserPasswordRequest;
 import com.project.requests.UserSearchRequest;
 import com.project.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -82,11 +83,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String changePassword(UserPasswordRequest userPasswordRequest) throws Exception {
+        Optional<User> user = userRepository.findByUsername(userPasswordRequest.getUsername());
+        if (!user.isPresent()) {
+            throw new DataNotFoundException("Cannot find user with name " + userPasswordRequest.getUsername());
+        } else if (!passwordEncoder.matches(userPasswordRequest.getPassword(), user.get().getPassword())) {
+            return "Mật khẩu không chính xác";
+        } else if (!userPasswordRequest.getNewPassword().equals(userPasswordRequest.getRetypePassword())) {
+            return "Nhập lại mật khẩu không khớp";
+        } else {
+            user.get().setPassword(passwordEncoder.encode(userPasswordRequest.getNewPassword()));
+            userRepository.save(user.get());
+            return "Thành công";
+        }
+    }
+
+    @Override
     @Transactional
     public void createUser(UserDTO userDTO, MultipartFile multipartFile) throws Exception {
         //Check tài khoản tồn tại chưa
-        String username = userDTO.getUsername();
-        if (userRepository.existsByUsername(username)) {
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
             throw new DataIntegrityViolationException("Tài khoản đã tồn tại");
         }
 

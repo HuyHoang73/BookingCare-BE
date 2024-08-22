@@ -17,9 +17,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "(:#{#dto.dateBookingTo} IS NULL OR b.dateBooking <= :#{#dto.dateBookingTo})")
     List<Booking> searchBookings(@Param("dto") BookingSearchRequest bookingSearchRequest);
 
-    @Query("SELECT b FROM Booking b WHERE b.userBookingEntities.username = :username AND b.dateBooking BETWEEN :startOfWeek AND :endOfWeek")
+    @Query("SELECT b FROM Booking b WHERE " +
+            "(:username IS NULL OR b.userBookingEntities.username = :username) AND " +
+            "(:startOfWeek IS NULL OR b.dateBooking >= :startOfWeek) AND " +
+            "(:endOfWeek IS NULL OR b.dateBooking <= :endOfWeek)")
     List<Booking> getCalendar(@Param("startOfWeek") LocalDate startOfWeek,
                               @Param("endOfWeek") LocalDate endOfWeek,
                               @Param("username") String username);
+
 
 }

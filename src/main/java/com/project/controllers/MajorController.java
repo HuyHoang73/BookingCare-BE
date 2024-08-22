@@ -2,10 +2,8 @@ package com.project.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.dto.MajorDTO;
-import com.project.requests.MajorSearchRequest;
 import com.project.responses.MajorResponse;
 import com.project.services.MajorService;
-import com.project.services.impl.CloudinaryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +17,14 @@ import java.util.List;
 @RequestMapping("api/majors")
 public class MajorController {
     private final MajorService majorService;
-    private final CloudinaryServiceImpl cloudinaryService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping("/search")
-    public ResponseEntity<?> getAllMajors(@RequestBody MajorSearchRequest majorSearchRequest) {
+    @GetMapping()
+    public ResponseEntity<?> getAllMajors(@RequestParam(value = "name", required = false) String name,
+                                          @RequestParam(value = "minDoctors", required = false) Integer minDoctors,
+                                          @RequestParam(value = "maxDoctors", required = false) Integer maxDoctors) {
         try{
-            List<MajorResponse> majors = majorService.getAllMajors(majorSearchRequest);
+            List<MajorResponse> majors = majorService.getAllMajors(name, minDoctors, maxDoctors);
             return ResponseEntity.ok().body(majors);
         }
         catch (Exception ex){
@@ -48,7 +47,6 @@ public class MajorController {
     public ResponseEntity<?> createMajor(@RequestPart("file") MultipartFile multipartFile,
                                          @RequestParam("majordto") String majordtoJson) {
         try {
-            // Chuyển đổi chuỗi JSON thành đối tượng Major
             MajorDTO majorDTO = objectMapper.readValue(majordtoJson, MajorDTO.class);
             majorService.createMajor(majorDTO, multipartFile);
             return ResponseEntity.ok().body("Thành công");

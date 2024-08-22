@@ -5,7 +5,6 @@ import com.project.dto.MajorDTO;
 import com.project.exceptions.DataNotFoundException;
 import com.project.models.Major;
 import com.project.repositories.MajorRepository;
-import com.project.requests.MajorSearchRequest;
 import com.project.responses.MajorResponse;
 import com.project.services.MajorService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,8 @@ public class MajorServiceImpl implements MajorService {
     private final ModelMapper modelMapper;
 
     @Override
-    public List<MajorResponse> getAllMajors(MajorSearchRequest majorSearchRequest) {
-        return majorRepository.getAllMajors(majorSearchRequest).stream()
+    public List<MajorResponse> getAllMajors(String name, Integer minDoctors, Integer maxDoctors) {
+        return majorRepository.getAllMajors(name, minDoctors, maxDoctors).stream()
                 .map(majorConverter::fromMajorToMajorResponse) //Chuyển từng Major thành MajorResponse
                 .collect(Collectors.toList()); //Tạo List mới
     }

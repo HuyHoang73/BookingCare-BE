@@ -1,12 +1,15 @@
 package com.project.controllers;
 
 import com.project.dto.UserDTO;
+import com.project.requests.UserPasswordRequest;
 import com.project.requests.UserSearchRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +53,19 @@ public class UserController {
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()); //rule 5
+        }
+    }
+
+    @PostMapping("change-password")
+    public ResponseEntity<?> changePassword(@RequestBody UserPasswordRequest userPasswordRequest) throws Exception {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            userPasswordRequest.setUsername(authentication.getName());
+            String message = userService.changePassword(userPasswordRequest);
+            return ResponseEntity.ok().body(message);
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 

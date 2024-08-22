@@ -24,11 +24,9 @@ public class UserConverter {
      */
     public User fromDTOtoUser(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
-        Long majorId = userDTO.getMajorId();
-        user.setMajorUserEntities(majorRepository.findById(majorId).get());
-        String dob = userDTO.getDateOfBirth();
+        user.setMajorUserEntities(majorRepository.findById(userDTO.getMajorId()).get());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
+        LocalDate dateOfBirth = LocalDate.parse(userDTO.getDateOfBirth(), formatter);
         user.setDateOfBirth(dateOfBirth);
         return user;
     }
@@ -40,17 +38,15 @@ public class UserConverter {
      */
     public UserDTO fromUserToDTO(User user) {
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-        Long majorId = user.getMajorUserEntities().getId();
-        userDTO.setMajorId(majorId);
-        LocalDate dateOfBirth = user.getDateOfBirth();
+        userDTO.setMajorId(user.getMajorUserEntities().getId());
+        userDTO.setMajorName(user.getMajorUserEntities().getName());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String dob = dateOfBirth.format(formatter);
-        userDTO.setDateOfBirth(dob);
+        userDTO.setDateOfBirth(user.getDateOfBirth().format(formatter));
         return userDTO;
     }
 
     /**
-     * Phương thức sau để cập nhật 1 User t DTO
+     * Phương thức sau để cập nhật 1 User
      *
      * @param userDTO - DTO dùng để sao chép
      * @param user    - User cần sao chép
@@ -64,9 +60,8 @@ public class UserConverter {
         }
 
         if (userDTO.getDateOfBirth() != null) {
-            String dob = userDTO.getDateOfBirth();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
+            LocalDate dateOfBirth = LocalDate.parse(userDTO.getDateOfBirth(), formatter);
             user.setDateOfBirth(dateOfBirth);
         }
     }
