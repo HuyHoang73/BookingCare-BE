@@ -11,11 +11,14 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE " +
-            "(:#{#dto.username} IS NULL OR b.userBookingEntities.username = :#{#dto.username}) AND " +
-            "(:#{#dto.status} IS NULL OR b.status = :#{#dto.status}) AND " +
-            "(:#{#dto.dateBookingFrom} IS NULL OR b.dateBooking >= :#{#dto.dateBookingFrom}) AND " +
-            "(:#{#dto.dateBookingTo} IS NULL OR b.dateBooking <= :#{#dto.dateBookingTo})")
-    List<Booking> searchBookings(@Param("dto") BookingSearchRequest bookingSearchRequest);
+            "(:username IS NULL OR b.userBookingEntities.username = :username) AND " +
+            "(:status IS NULL OR b.status = :status) AND " +
+            "(:dateBookingFrom IS NULL OR b.dateBooking >= :dateBookingFrom) AND " +
+            "(:dateBookingTo IS NULL OR b.dateBooking <= :dateBookingTo)")
+    List<Booking> searchBookings(@Param("username") String username,
+                                 @Param("status") String status,
+                                 @Param("dateBookingFrom") String dateBookingFrom,
+                                 @Param("dateBookingTo") String dateBookingTo);
 
     @Query("SELECT b FROM Booking b WHERE " +
             "(:username IS NULL OR b.userBookingEntities.username = :username) AND " +

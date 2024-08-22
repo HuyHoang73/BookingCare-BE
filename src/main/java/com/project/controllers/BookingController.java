@@ -29,17 +29,19 @@ public class BookingController {
     private final BookingRepository bookingRepository;
 
     @PostMapping("/search")
-    public ResponseEntity<?> getAllBookings(@RequestBody BookingSearchRequest bookingSearchRequest) {
+    public ResponseEntity<?> getAllBookings(@RequestParam(value = "status", required = false) String status,
+                                            @RequestParam(value = "dateBookingFrom", required = false) String dateBookingFrom,
+                                            @RequestParam(value = "dateBookingTo", required = false) String dateBookingTo) {
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             boolean isAdmin = authorities.stream()
                     .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+            StringBuilder username = new StringBuilder();
             if(!isAdmin) {
-                String username = authentication.getName();
-                bookingSearchRequest.setUsername(username);
+                username.append(authentication.getName());
             }
-            List<BookingResponse> result = bookingService.getAllBookings(bookingSearchRequest);
+            List<BookingResponse> result = bookingService.getAllBookings(username.toString(), status, dateBookingFrom, dateBookingTo);
             return ResponseEntity.ok().body(result);
         }
         catch (Exception ex) {

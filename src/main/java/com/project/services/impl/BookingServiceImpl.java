@@ -159,8 +159,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponse> getAllBookings(BookingSearchRequest bookingSearchRequest) throws DataNotFoundException {
-        return bookingRepository.searchBookings(bookingSearchRequest).stream()
+    public List<BookingResponse> getAllBookings(String username, String status, String dateBookingFrom, String dateBookingTo) throws DataNotFoundException {
+        return bookingRepository.searchBookings(username, status, dateBookingFrom, dateBookingTo).stream()
                 .map(bookingConverter::fromBookingToBookingResponse)
                 .collect(Collectors.toList());
     }

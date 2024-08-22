@@ -14,6 +14,6 @@ import java.util.List;
 public interface BookingService {
     void createBooking(BookingDTO bookingDTO) throws ResourceAlreadyExitsException, MessagingException;
     void updateBooking(BookingUpdateRequest bookingUpdateRequest) throws MessagingException;
-    List<BookingResponse> getAllBookings(BookingSearchRequest bookingSearchRequest) throws DataNotFoundException;
+    List<BookingResponse> getAllBookings(String username, String status, String dateBookingFrom, String dateBookingTo) throws DataNotFoundException;
     List<CalendarResponse> getCalendars(String username) throws DataNotFoundException;
 }
